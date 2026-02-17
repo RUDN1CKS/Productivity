@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Productivity Hub Pro</title> <style> body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f4;} header { background:#2d89ef; color:white; padding:15px; text-align:center;} nav button { margin:5px; padding:8px 12px; cursor:pointer;} section { margin:15px; padding:15px; background:white; border-radius:5px; box-shadow:0 0 5px rgba(0,0,0,0.1);} input, select, button { margin:5px 0; padding:5px;} .task-high { color:red; } .task-medium { color:orange; } .task-low { color:green; } .chart-bar { height:20px; background:#2d89ef; margin:3px 0; color:white; text-align:center;} </style> </head> <body>
+
+<header>
+  <h1>Productivity Hub Pro</h1>
+  <nav>
+    <button onclick="showSection('dashboard')">Dashboard</button>
+    <button onclick="showSection('tasks')">Tasks</button>
+    <button onclick="showSection('sops')">SOPs/Templates</button>
+    <button onclick="showSection('finances')">Finances</button>
+  </nav>
+</header>
+
+<main>
+  <!-- Dashboard -->
+  <section id="dashboard">
+    <h2>Dashboard</h2>
+    <div id="dashboard-tasks"></div>
+    <div id="dashboard-finances"></div>
+    <h3>Task Progress</h3>
+    <div id="progressChart"></div>
+  </section>
+
+  <!-- Tasks -->
+  <section id="tasks" style="display:none;">
+    <h2>Tasks & Deadlines</h2>
+    <input type="text" id="taskInput" placeholder="New task">
+    <input type="date" id="taskDate">
+    <select id="taskPriority">
+      <option value="high">High</option>
+      <option value="medium">Medium</option>
+      <option value="low">Low</option>
+    </select>
+    <button onclick="addTask()">Add Task</button>
+    <ul id="taskList"></ul>
+    <button onclick="exportTasks()">Export Tasks CSV</button>
+    <input type="file" id="importTasksFile" onchange="importTasks(event)">
+  </section>
+
+  <!-- SOPs/Templates -->
+  <section id="sops" style="display:none;">
+    <h2>SOPs & Templates</h2>
+    <input type="text" id="sopInput" placeholder="New SOP/Template">
+    <button onclick="addSOP()">Add SOP</button>
+    <ul id="sopList"></ul>
+  </section>
+
+  <!-- Finances -->
+  <section id="finances" style="display:none;">
+    <h2>Finance Tracker</h2>
+    <input type="text" id="financeDesc" placeholder="Description">
+    <input type="number" id="financeAmount" placeholder="Amount">
+    <button onclick="addFinance()">Add Entry</button>
+    <ul id="financeList"></ul>
+    <p>Total: $<span id="financeTotal">0</span></p>
+    <button onclick="exportFinances()">Export Finances CSV</button>
+    <input type="file" id="importFinancesFile" onchange="importFinances(event)">
+  </section>
+</main>
+
+<script>
+// Section toggle
+function showSection(sectionId){
+  document.querySelectorAll('main section').forEach(s=>s.style.display='none');
+  document.getElementById(sectionId).style.display='block';
+}
+
+// --- Tasks ---
+let tasks=[];
+function addTask(){
+  const text=document.getElementById('taskInput').value;
+  const date=document.getElementById('taskDate').value;
+  const priority=document.getElementById('taskPriority').value;
+  if(text){
+    tasks.push({text,date,priority,completed:false});
+    document.getElementById('taskInput').value='';
+    document.getElementById('taskDate').value='';
+    renderTasks();
+    updateDashboard();
+  }
+}
+
+function renderTasks(){
+  const list=document.getElementById('taskList');
+  list.innerHTML='';
+  tasks.forEach((t,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<input type="checkbox" ${t.completed?'checked':''} onclick="toggleTask(${i})">
+      <span class="task-${t.priority}">${t.text} - ${t.date} [${t.priority}]</span>`;
+    list.appendChild(li);
+  });
+}
+
+function toggleTask(index){
+  tasks[index].completed=!tasks[index].completed;
+  renderTasks();
+  updateDashboard();
+}
+
+// --- Dashboard ---
+function updateDashboard(){
+  // Tasks due today
+  const today=new Date().toISOString().split('T')[0];
+  const dueToday=tasks.filter(t=>t.date===today && !t.completed);
+  document.getElementById('dashboard-tasks').innerHTML=`Tasks due today: ${dueToday.length}`;
+  
+  // Progress chart
+  const completed=tasks.filter(t=>t.completed).length;
+  const total=tasks.length || 1;
+  const chartDiv=document.getElementById('progressChart');
+  chartDiv.innerHTML=`<div class="chart-bar" style="width:${(completed/total)*100}%">${completed} / ${tasks.length} done</div>`; }
+
+// --- SOPs ---
+let sops=[];
+function addSOP(){
+  const sop=document.getElementById('sopInput').value;
+  if(sop){
+    sops.push(sop);
+    document.getElementById('sopInput').value='';
+    renderSOPs();
+  }
+}
+
+function renderSOPs(){
+  const list=document.getElementById('sopList');
+  list.innerHTML='';
+  sops.forEach(s=>{
+    const li=document.createElement('li');
+    li.textContent=s;
+    list.appendChild(li);
+  });
+}
+
+// --- Finances ---
+let finances=[];
+function addFinance(){
+  const desc=document.getElementById('financeDesc').value;
+  const amount=parseFloat(document.getElementById('financeAmount').value);
+  if(desc && !isNaN(amount)){
+    finances.push({desc,amount});
+    document.getElementById('financeDesc').value='';
+    document.getElementById('financeAmount').value='';
+    renderFinances();
+  }
+}
+
+function renderFinances(){
+  const list=document.getElementById('financeList');
+  list.innerHTML='';
+  let total=0;
+  finances.forEach(f=>{
+    const li=document.createElement('li');
+    li.textContent=`${f.desc}: $${f.amount}`;
+    list.appendChild(li);
+    total+=f.amount;
+  });
+  document.getElementById('financeTotal').textContent=total.toFixed(2);
+  document.getElementById('dashboard-finances').innerHTML=`Total Balance: $${total.toFixed(2)}`; }
+
+// --- Export/Import ---
+function exportTasks(){
+  let csv='Task,Date,Priority,Completed\n';
+  tasks.forEach(t=>csv+=`${t.text},${t.date},${t.priority},${t.completed}\n`);
+  downloadCSV(csv,'tasks.csv');
+}
+
+function exportFinances(){
+  let csv='Description,Amount\n';
+  finances.forEach(f=>csv+=`${f.desc},${f.amount}\n`);
+  downloadCSV(csv,'finances.csv');
+}
+
+function downloadCSV(csv,filename){
+  const blob=new Blob([csv],{type:'text/csv'});
+  const link=document.createElement('a');
+  link.href=URL.createObjectURL(blob);
+  link.download=filename;
+  link.click();
+}
+
+function importTasks(event){
+  const file=event.target.files[0];
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const lines=e.target.result.split('\n').slice(1);
+    lines.forEach(line=>{
+      if(line.trim()==='')return;
+      const [text,date,priority,completed]=line.split(',');
+      tasks.push({text,date,priority,completed:completed==='true'});
+    });
+    renderTasks();
+    updateDashboard();
+  };
+  reader.readAsText(file);
+}
+
+function importFinances(event){
+  const file=event.target.files[0];
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const lines=e.target.result.split('\n').slice(1);
+    lines.forEach(line=>{
+      if(line.trim()==='')return;
+      const [desc,amount]=line.split(',');
+      finances.push({desc,amount:parseFloat(amount)});
+    });
+    renderFinances();
+  };
+  reader.readAsText(file);
+}
+
+// Initial update
+updateDashboard();
+</script>
+
+</body>
+</html>
