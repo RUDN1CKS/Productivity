@@ -2,7 +2,64 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Productivity Hub Pro</title> <style> body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f4;} header { background:#2d89ef; color:white; padding:15px; text-align:center;} nav button { margin:5px; padding:8px 12px; cursor:pointer;} section { margin:15px; padding:15px; background:white; border-radius:5px; box-shadow:0 0 5px rgba(0,0,0,0.1);} input, select, button { margin:5px 0; padding:5px;} .task-high { color:red; } .task-medium { color:orange; } .task-low { color:green; } .chart-bar { height:20px; background:#2d89ef; margin:3px 0; color:white; text-align:center;} </style> </head> <body>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Productivity Hub Pro - IT Dashboard</title> <style>
+/* Base */
+body {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  margin:0; padding:0;
+  background:#121212;
+  color:#FFD700;
+}
+header {
+  background:#1a1a1a;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:15px 30px; border-bottom:2px solid #FFD700; } header h1 { margin:0; font-size:1.5em; color:#FFD700;} nav button {
+  background:#1a1a1a; color:#FFD700; border:1px solid #FFD700;
+  padding:8px 15px; margin-left:10px; cursor:pointer; border-radius:4px;
+  transition:0.3s;
+}
+nav button:hover { background:#FFD700; color:#1a1a1a; }
+
+main { display:flex; flex-wrap:wrap; justify-content:space-around; padding:20px; }
+
+/* Section Cards */
+section {
+  background:#1e1e1e;
+  padding:20px;
+  border-radius:8px;
+  margin:15px;
+  flex:1 1 400px;
+  box-shadow:0 0 15px rgba(255,215,0,0.2); } section h2 { margin-top:0; color:#FFD700; }
+
+input, select, button {
+  margin:5px 0; padding:5px; border-radius:4px; border:none; } input, select { width:calc(100% - 10px); } button { cursor:pointer; transition:0.3s; }
+
+/* Tasks */
+.task-high { color:#FF4C4C; font-weight:bold; } .task-medium { color:#FFD700; font-weight:bold; } .task-low { color:#4CFF4C; font-weight:bold; }
+
+/* Progress Bar */
+.progress-bar-container {
+  background:#333;
+  border-radius:10px;
+  overflow:hidden;
+  margin:10px 0;
+}
+.progress-bar {
+  height:25px;
+  background:#FFD700;
+  width:0%;
+  text-align:center;
+  color:#1a1a1a;
+  font-weight:bold;
+  line-height:25px;
+  transition:0.5s;
+}
+
+/* Finance List */
+#financeList li, #taskList li, #sopList li { margin:5px 0; }
+
+/* Responsive */
+@media(max-width:900px){ main { flex-direction:column; align-items:center; } } </style> </head> <body>
 
 <header>
   <h1>Productivity Hub Pro</h1>
@@ -15,51 +72,50 @@
 </header>
 
 <main>
-  <!-- Dashboard -->
-  <section id="dashboard">
-    <h2>Dashboard</h2>
-    <div id="dashboard-tasks"></div>
-    <div id="dashboard-finances"></div>
-    <h3>Task Progress</h3>
-    <div id="progressChart"></div>
-  </section>
+<!-- Dashboard -->
+<section id="dashboard">
+  <h2>Dashboard Overview</h2>
+  <p id="dashboard-tasks">Tasks due today: 0</p>
+  <p id="dashboard-finances">Total Balance: $0.00</p>
+  <h3>Task Progress</h3>
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar">0 / 0 done</div>
+  </div>
+</section>
 
-  <!-- Tasks -->
-  <section id="tasks" style="display:none;">
-    <h2>Tasks & Deadlines</h2>
-    <input type="text" id="taskInput" placeholder="New task">
-    <input type="date" id="taskDate">
-    <select id="taskPriority">
-      <option value="high">High</option>
-      <option value="medium">Medium</option>
-      <option value="low">Low</option>
-    </select>
-    <button onclick="addTask()">Add Task</button>
-    <ul id="taskList"></ul>
-    <button onclick="exportTasks()">Export Tasks CSV</button>
-    <input type="file" id="importTasksFile" onchange="importTasks(event)">
-  </section>
+<!-- Tasks -->
+<section id="tasks" style="display:none;">
+  <h2>Tasks & Deadlines</h2>
+  <input type="text" id="taskInput" placeholder="New task">
+  <input type="date" id="taskDate">
+  <select id="taskPriority">
+    <option value="high">High</option>
+    <option value="medium">Medium</option>
+    <option value="low">Low</option>
+  </select>
+  <button onclick="addTask()">Add Task</button>
+  <ul id="taskList"></ul>
+  <button onclick="exportTasks()">Export Tasks CSV</button>
+  <input type="file" id="importTasksFile" onchange="importTasks(event)"> </section>
 
-  <!-- SOPs/Templates -->
-  <section id="sops" style="display:none;">
-    <h2>SOPs & Templates</h2>
-    <input type="text" id="sopInput" placeholder="New SOP/Template">
-    <button onclick="addSOP()">Add SOP</button>
-    <ul id="sopList"></ul>
-  </section>
+<!-- SOPs/Templates -->
+<section id="sops" style="display:none;">
+  <h2>SOPs & Templates</h2>
+  <input type="text" id="sopInput" placeholder="New SOP/Template">
+  <button onclick="addSOP()">Add SOP</button>
+  <ul id="sopList"></ul>
+</section>
 
-  <!-- Finances -->
-  <section id="finances" style="display:none;">
-    <h2>Finance Tracker</h2>
-    <input type="text" id="financeDesc" placeholder="Description">
-    <input type="number" id="financeAmount" placeholder="Amount">
-    <button onclick="addFinance()">Add Entry</button>
-    <ul id="financeList"></ul>
-    <p>Total: $<span id="financeTotal">0</span></p>
-    <button onclick="exportFinances()">Export Finances CSV</button>
-    <input type="file" id="importFinancesFile" onchange="importFinances(event)">
-  </section>
-</main>
+<!-- Finances -->
+<section id="finances" style="display:none;">
+  <h2>Finance Tracker</h2>
+  <input type="text" id="financeDesc" placeholder="Description">
+  <input type="number" id="financeAmount" placeholder="Amount">
+  <button onclick="addFinance()">Add Entry</button>
+  <ul id="financeList"></ul>
+  <p>Total: $<span id="financeTotal">0</span></p>
+  <button onclick="exportFinances()">Export Finances CSV</button>
+  <input type="file" id="importFinancesFile" onchange="importFinances(event)"> </section> </main>
 
 <script>
 // Section toggle
@@ -102,16 +158,15 @@ function toggleTask(index){
 
 // --- Dashboard ---
 function updateDashboard(){
-  // Tasks due today
   const today=new Date().toISOString().split('T')[0];
   const dueToday=tasks.filter(t=>t.date===today && !t.completed);
-  document.getElementById('dashboard-tasks').innerHTML=`Tasks due today: ${dueToday.length}`;
+  document.getElementById('dashboard-tasks').textContent=`Tasks due today: ${dueToday.length}`;
   
-  // Progress chart
   const completed=tasks.filter(t=>t.completed).length;
   const total=tasks.length || 1;
-  const chartDiv=document.getElementById('progressChart');
-  chartDiv.innerHTML=`<div class="chart-bar" style="width:${(completed/total)*100}%">${completed} / ${tasks.length} done</div>`; }
+  const progressBar=document.getElementById('progressBar');
+  progressBar.style.width=((completed/total)*100)+'%';
+  progressBar.textContent=`${completed} / ${tasks.length} done`; }
 
 // --- SOPs ---
 let sops=[];
@@ -158,7 +213,7 @@ function renderFinances(){
     total+=f.amount;
   });
   document.getElementById('financeTotal').textContent=total.toFixed(2);
-  document.getElementById('dashboard-finances').innerHTML=`Total Balance: $${total.toFixed(2)}`; }
+  document.getElementById('dashboard-finances').textContent=`Total Balance: $${total.toFixed(2)}`; }
 
 // --- Export/Import ---
 function exportTasks(){
@@ -215,6 +270,5 @@ function importFinances(event){
 // Initial update
 updateDashboard();
 </script>
-
 </body>
 </html>
