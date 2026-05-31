@@ -1,274 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Productivity Hub Pro - IT Dashboard</title> <style>
-/* Base */
-body {
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  margin:0; padding:0;
-  background:#121212;
-  color:#FFD700;
-}
-header {
-  background:#1a1a1a;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:15px 30px; border-bottom:2px solid #FFD700; } header h1 { margin:0; font-size:1.5em; color:#FFD700;} nav button {
-  background:#1a1a1a; color:#FFD700; border:1px solid #FFD700;
-  padding:8px 15px; margin-left:10px; cursor:pointer; border-radius:4px;
-  transition:0.3s;
-}
-nav button:hover { background:#FFD700; color:#1a1a1a; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marisa Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-main { display:flex; flex-wrap:wrap; justify-content:space-around; padding:20px; }
+<body>
 
-/* Section Cards */
-section {
-  background:#1e1e1e;
-  padding:20px;
-  border-radius:8px;
-  margin:15px;
-  flex:1 1 400px;
-  box-shadow:0 0 15px rgba(255,215,0,0.2); } section h2 { margin-top:0; color:#FFD700; }
+<div class="app">
 
-input, select, button {
-  margin:5px 0; padding:5px; border-radius:4px; border:none; } input, select { width:calc(100% - 10px); } button { cursor:pointer; transition:0.3s; }
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>MP</h2>
 
-/* Tasks */
-.task-high { color:#FF4C4C; font-weight:bold; } .task-medium { color:#FFD700; font-weight:bold; } .task-low { color:#4CFF4C; font-weight:bold; }
+        <button onclick="showTab('home')">🏠 Home</button>
+        <button onclick="showTab('chat')">💬 Chat</button>
+        <button onclick="showTab('todo')">📝 To-Do</button>
+        <button onclick="showTab('malana')">🤖 Malana</button>
+        <button onclick="showTab('games')">🎮 Games</button>
+    </div>
 
-/* Progress Bar */
-.progress-bar-container {
-  background:#333;
-  border-radius:10px;
-  overflow:hidden;
-  margin:10px 0;
-}
-.progress-bar {
-  height:25px;
-  background:#FFD700;
-  width:0%;
-  text-align:center;
-  color:#1a1a1a;
-  font-weight:bold;
-  line-height:25px;
-  transition:0.5s;
-}
+    <!-- MAIN AREA -->
+    <div class="main">
 
-/* Finance List */
-#financeList li, #taskList li, #sopList li { margin:5px 0; }
+        <!-- HOME -->
+        <div id="home" class="tab active">
+            <h1>Welcome to Marisa Portal ❤️</h1>
+            <div class="card">
+                Your private hub for chat, tasks, games, and Malana AI.
+            </div>
+        </div>
 
-/* Responsive */
-@media(max-width:900px){ main { flex-direction:column; align-items:center; } } </style> </head> <body>
+        <!-- CHAT -->
+        <div id="chat" class="tab">
+            <h1>💬 Chat</h1>
 
-<header>
-  <h1>Productivity Hub Pro</h1>
-  <nav>
-    <button onclick="showSection('dashboard')">Dashboard</button>
-    <button onclick="showSection('tasks')">Tasks</button>
-    <button onclick="showSection('sops')">SOPs/Templates</button>
-    <button onclick="showSection('finances')">Finances</button>
-  </nav>
-</header>
+            <div id="chatBox" class="box"></div>
 
-<main>
-<!-- Dashboard -->
-<section id="dashboard">
-  <h2>Dashboard Overview</h2>
-  <p id="dashboard-tasks">Tasks due today: 0</p>
-  <p id="dashboard-finances">Total Balance: $0.00</p>
-  <h3>Task Progress</h3>
-  <div class="progress-bar-container">
-    <div class="progress-bar" id="progressBar">0 / 0 done</div>
-  </div>
-</section>
+            <div class="row">
+                <input id="chatInput" placeholder="Type a message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
 
-<!-- Tasks -->
-<section id="tasks" style="display:none;">
-  <h2>Tasks & Deadlines</h2>
-  <input type="text" id="taskInput" placeholder="New task">
-  <input type="date" id="taskDate">
-  <select id="taskPriority">
-    <option value="high">High</option>
-    <option value="medium">Medium</option>
-    <option value="low">Low</option>
-  </select>
-  <button onclick="addTask()">Add Task</button>
-  <ul id="taskList"></ul>
-  <button onclick="exportTasks()">Export Tasks CSV</button>
-  <input type="file" id="importTasksFile" onchange="importTasks(event)"> </section>
+        <!-- TODO -->
+        <div id="todo" class="tab">
+            <h1>📝 To-Do List</h1>
 
-<!-- SOPs/Templates -->
-<section id="sops" style="display:none;">
-  <h2>SOPs & Templates</h2>
-  <input type="text" id="sopInput" placeholder="New SOP/Template">
-  <button onclick="addSOP()">Add SOP</button>
-  <ul id="sopList"></ul>
-</section>
+            <div class="row">
+                <input id="todoInput" placeholder="Add task...">
+                <button onclick="addTask()">Add</button>
+            </div>
 
-<!-- Finances -->
-<section id="finances" style="display:none;">
-  <h2>Finance Tracker</h2>
-  <input type="text" id="financeDesc" placeholder="Description">
-  <input type="number" id="financeAmount" placeholder="Amount">
-  <button onclick="addFinance()">Add Entry</button>
-  <ul id="financeList"></ul>
-  <p>Total: $<span id="financeTotal">0</span></p>
-  <button onclick="exportFinances()">Export Finances CSV</button>
-  <input type="file" id="importFinancesFile" onchange="importFinances(event)"> </section> </main>
+            <ul id="todoList"></ul>
+        </div>
 
-<script>
-// Section toggle
-function showSection(sectionId){
-  document.querySelectorAll('main section').forEach(s=>s.style.display='none');
-  document.getElementById(sectionId).style.display='block';
-}
+        <!-- MALANA -->
+        <div id="malana" class="tab">
+            <h1>🤖 Malana AI</h1>
 
-// --- Tasks ---
-let tasks=[];
-function addTask(){
-  const text=document.getElementById('taskInput').value;
-  const date=document.getElementById('taskDate').value;
-  const priority=document.getElementById('taskPriority').value;
-  if(text){
-    tasks.push({text,date,priority,completed:false});
-    document.getElementById('taskInput').value='';
-    document.getElementById('taskDate').value='';
-    renderTasks();
-    updateDashboard();
-  }
-}
+            <div id="aiBox" class="box"></div>
 
-function renderTasks(){
-  const list=document.getElementById('taskList');
-  list.innerHTML='';
-  tasks.forEach((t,i)=>{
-    const li=document.createElement('li');
-    li.innerHTML=`<input type="checkbox" ${t.completed?'checked':''} onclick="toggleTask(${i})">
-      <span class="task-${t.priority}">${t.text} - ${t.date} [${t.priority}]</span>`;
-    list.appendChild(li);
-  });
-}
+            <div class="row">
+                <input id="aiInput" placeholder="Ask Malana...">
+                <button onclick="askMalana()">Ask</button>
+            </div>
+        </div>
 
-function toggleTask(index){
-  tasks[index].completed=!tasks[index].completed;
-  renderTasks();
-  updateDashboard();
-}
+        <!-- GAMES -->
+        <div id="games" class="tab">
+            <h1>🎮 Games</h1>
 
-// --- Dashboard ---
-function updateDashboard(){
-  const today=new Date().toISOString().split('T')[0];
-  const dueToday=tasks.filter(t=>t.date===today && !t.completed);
-  document.getElementById('dashboard-tasks').textContent=`Tasks due today: ${dueToday.length}`;
-  
-  const completed=tasks.filter(t=>t.completed).length;
-  const total=tasks.length || 1;
-  const progressBar=document.getElementById('progressBar');
-  progressBar.style.width=((completed/total)*100)+'%';
-  progressBar.textContent=`${completed} / ${tasks.length} done`; }
+            <div class="card">
+                <p>Tic Tac Toe coming next step 👀</p>
+            </div>
+        </div>
 
-// --- SOPs ---
-let sops=[];
-function addSOP(){
-  const sop=document.getElementById('sopInput').value;
-  if(sop){
-    sops.push(sop);
-    document.getElementById('sopInput').value='';
-    renderSOPs();
-  }
-}
+    </div>
 
-function renderSOPs(){
-  const list=document.getElementById('sopList');
-  list.innerHTML='';
-  sops.forEach(s=>{
-    const li=document.createElement('li');
-    li.textContent=s;
-    list.appendChild(li);
-  });
-}
+</div>
 
-// --- Finances ---
-let finances=[];
-function addFinance(){
-  const desc=document.getElementById('financeDesc').value;
-  const amount=parseFloat(document.getElementById('financeAmount').value);
-  if(desc && !isNaN(amount)){
-    finances.push({desc,amount});
-    document.getElementById('financeDesc').value='';
-    document.getElementById('financeAmount').value='';
-    renderFinances();
-  }
-}
+<script src="app.js"></script>
 
-function renderFinances(){
-  const list=document.getElementById('financeList');
-  list.innerHTML='';
-  let total=0;
-  finances.forEach(f=>{
-    const li=document.createElement('li');
-    li.textContent=`${f.desc}: $${f.amount}`;
-    list.appendChild(li);
-    total+=f.amount;
-  });
-  document.getElementById('financeTotal').textContent=total.toFixed(2);
-  document.getElementById('dashboard-finances').textContent=`Total Balance: $${total.toFixed(2)}`; }
-
-// --- Export/Import ---
-function exportTasks(){
-  let csv='Task,Date,Priority,Completed\n';
-  tasks.forEach(t=>csv+=`${t.text},${t.date},${t.priority},${t.completed}\n`);
-  downloadCSV(csv,'tasks.csv');
-}
-
-function exportFinances(){
-  let csv='Description,Amount\n';
-  finances.forEach(f=>csv+=`${f.desc},${f.amount}\n`);
-  downloadCSV(csv,'finances.csv');
-}
-
-function downloadCSV(csv,filename){
-  const blob=new Blob([csv],{type:'text/csv'});
-  const link=document.createElement('a');
-  link.href=URL.createObjectURL(blob);
-  link.download=filename;
-  link.click();
-}
-
-function importTasks(event){
-  const file=event.target.files[0];
-  const reader=new FileReader();
-  reader.onload=function(e){
-    const lines=e.target.result.split('\n').slice(1);
-    lines.forEach(line=>{
-      if(line.trim()==='')return;
-      const [text,date,priority,completed]=line.split(',');
-      tasks.push({text,date,priority,completed:completed==='true'});
-    });
-    renderTasks();
-    updateDashboard();
-  };
-  reader.readAsText(file);
-}
-
-function importFinances(event){
-  const file=event.target.files[0];
-  const reader=new FileReader();
-  reader.onload=function(e){
-    const lines=e.target.result.split('\n').slice(1);
-    lines.forEach(line=>{
-      if(line.trim()==='')return;
-      const [desc,amount]=line.split(',');
-      finances.push({desc,amount:parseFloat(amount)});
-    });
-    renderFinances();
-  };
-  reader.readAsText(file);
-}
-
-// Initial update
-updateDashboard();
-</script>
 </body>
 </html>
